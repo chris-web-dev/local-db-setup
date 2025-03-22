@@ -1,17 +1,20 @@
 # 🛠️ local-db-setup
 
-Local development environment with **PostgreSQL**, **Microsoft SQL Server**, and browser-based UI tools using Docker Compose.
+Local development environment with **PostgreSQL**, **Microsoft SQL Server**, **MySQL**, **MongoDB**, and browser-based UI tools using Docker Compose.
 
 ---
 
 ## 📦 Services
 
-| Service   | Description                   | Port       |
-|-----------|-------------------------------|------------|
-| PostgreSQL | Relational database            | `5432`     |
-| SQL Server | Microsoft SQL Server 2022      | `1433`     |
-| pgAdmin    | Web UI for PostgreSQL          | `8082`     |
-| Adminer    | Web UI for SQL Server (light)  | `8081`     |
+| Service         | Description                        | Port       |
+|----------------|------------------------------------|------------|
+| PostgreSQL     | Relational database                | `5432`     |
+| SQL Server     | Microsoft SQL Server 2022          | `1433`     |
+| MySQL          | Relational database                | `3306`     |
+| MongoDB        | NoSQL document database            | `27017`    |
+| pgAdmin        | Web UI for PostgreSQL              | `8082`     |
+| Adminer        | Web UI for SQL Server (light)      | `8081`     |
+| Mongo Express  | Web UI for MongoDB                 | `8083`     |
 
 ---
 
@@ -47,73 +50,91 @@ PGADMIN_DEFAULT_PASSWORD=admin123
 
 ### 3. Start the Stack
 
+Using Docker directly:
+
 ```bash
 docker-compose --env-file .env up -d
 ```
 
-Using npm:
+Using npm scripts:
 
 ```bash
-
 npm run db:postgres     # Start PostgreSQL + pgAdmin
 npm run db:mssql        # Start SQL Server + Adminer
 npm run db:mysql        # Start MySQL only
 npm run db:mongo        # Start MongoDB + Mongo Express
 npm run db:up           # Start everything
 npm run db:down         # Stop all and remove volumes
-Or using Makefile (if installed):
+```
+
+Using Makefile (if installed):
 
 ```bash
-
 make db-postgres
 make db-mongo
 make db-down
 ```
+
 ---
 
 ### 4. Access Tools
 
-- **pgAdmin**: [http://localhost:8082](http://localhost:8082)  
-  - Email: `admin@local.dev`  
-  - Password: `admin123`  
-  - **Host when adding server**: `postgres`
+#### 🐘 pgAdmin (PostgreSQL)
 
-- **Adminer**: [http://localhost:8081](http://localhost:8081)  
-  - System: `Microsoft SQL Server`  
-  - Server: `mssql`  
-  - Username: `sa`  
-  - Password: `YourStrong!Passw0rd`
+- URL: [http://localhost:8082](http://localhost:8082)
+- Email: `admin@local.dev`
+- Password: `admin123`
+- Hostname (when adding a server): `postgres`
+
+#### 🧰 Adminer (SQL Server)
+
+- URL: [http://localhost:8081](http://localhost:8081)
+- System: `Microsoft SQL Server`
+- Server: `mssql`
+- Username: `sa`
+- Password: `YourStrong!Passw0rd`
+
+#### 🍃 Mongo Express
+
+- URL: [http://localhost:8083](http://localhost:8083)
+- Server: `mongo`
 
 ---
 
-## 🧪 Create Tables
+## 🧪 Create Tables & Seed Data
 
-Use pgAdmin, Adminer, or Mongo Express to browse, query, and modify data easily.
+- Use pgAdmin, Adminer, or Mongo Express to browse, query, and modify data.
+- Default seed files:
+  - PostgreSQL: `init/seed.sql`
+  - MySQL: `init-mysql/seed.sql`
+  - MongoDB: `init-mongo/init.js`
+
+> Seeds run only on first container startup or after volume reset.
 
 ---
 
 ## 🧼 Stopping & Cleaning
 
-To stop the environment:
+To stop and remove everything:
 
 ```bash
-npm run db:down          # Stop & delete volumes
-docker-compose down -v   # CLI alternative
+npm run db:down          # Or
+docker-compose down -v
 ```
 
-To remove all volumes (i.e., wipe databases):
+To cleanly reset all data, re-run with:
 
 ```bash
-docker-compose down -v
+docker-compose down -v && docker-compose --env-file .env up -d
 ```
 
 ---
 
 ## 📌 Notes
 
-- Do **not** use `localhost` as a hostname inside pgAdmin or Adminer — use the service name defined in `docker-compose.yml` (`postgres`, `mssql`).
-- All services are on a shared Docker network and can resolve each other by container name.
-- Port conflicts? Modify the exposed ports in `docker-compose.yml`.
+- Do **not** use `localhost` as hostname inside pgAdmin or Adminer — use container names (`postgres`, `mssql`, `mongo`, etc.).
+- Services share a Docker network and can resolve each other by container name.
+- If ports are taken, change the `host:container` mapping in `docker-compose.yml`.
 
 ---
 
@@ -122,8 +143,8 @@ docker-compose down -v
 ```
 local-db-setup/
 ├── docker-compose.yml
-├── .env                 # your credentials
-├── init/                # Postgres seed
+├── .env                 # Your credentials
+├── init/                # PostgreSQL seed
 │   └── seed.sql
 ├── init-mysql/          # MySQL seed
 │   └── seed.sql
@@ -138,21 +159,19 @@ local-db-setup/
 
 ---
 
-📘 Tips
-- Need Redis, ElasticSearch, or RabbitMQ? Just plug them in.
-- Want pre-built datasets? Add data.sql, dump.json, etc.
-- This is production-style architecture made dev-friendly.
-
----
-
 ## 🔮 Coming Soon
 
-- SQL seed files for both databases
-- Optional volume-based initialization
-- pgAdmin server pre-config export
+- SQL seed files for each DB
+- Volume-based data initialization
+- Optional CI integration
+- DBeaver in Docker
 
 ---
 
 ## 👨‍💻 Author
 
-Built by [Christopher Tønnesland](link) — Feel free to use and adapt this for your projects.
+Built by [Christopher Tønnesland](#) — use, fork, contribute. Make local dev fast, clean, and production-style.
+
+---
+
+V7diB62n-X2iwAv

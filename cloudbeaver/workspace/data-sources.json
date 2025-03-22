@@ -1,0 +1,49 @@
+{
+  "version": "1.0",
+  "connections": [
+    {
+      "id": "postgres-local",
+      "name": "PostgreSQL",
+      "driver": "postgresql",
+      "host": "postgres",
+      "port": 5432,
+      "database": "devdb",
+      "user": "devuser",
+      "savePassword": true,
+      "password": "devpass"
+    },
+    {
+      "id": "mysql-local",
+      "name": "MySQL",
+      "driver": "mysql",
+      "host": "mysql",
+      "port": 3306,
+      "database": "devmysql",
+      "user": "devuser",
+      "savePassword": true,
+      "password": "devpass"
+    },
+    {
+      "id": "mssql-local",
+      "name": "SQL Server",
+      "driver": "mssql",
+      "host": "mssql",
+      "port": 1433,
+      "database": "devsqldb",
+      "user": "sa",
+      "savePassword": true,
+      "password": "YourStrong!Passw0rd"
+    },
+    {
+      "id": "mongo-local",
+      "name": "MongoDB",
+      "driver": "mongodb",
+      "host": "mongo",
+      "port": 27017,
+      "database": "admin",
+      "user": "",
+      "savePassword": false,
+      "password": ""
+    }
+  ]
+}

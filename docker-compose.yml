@@ -11,7 +11,7 @@ services:
    - "5432:5432"
   volumes:
    - pgdata:/var/lib/postgresql/data
-   - ./init:/docker-entrypoint-initdb.d
+   - ./init/postgres:/docker-entrypoint-initdb.d
 
  pgadmin:
   image: dpage/pgadmin4:latest
@@ -40,6 +40,17 @@ services:
   volumes:
    - mssqldata:/var/opt/mssql
 
+ mssql-seed:
+  image: mcr.microsoft.com/mssql-tools
+  container_name: mssql-seed-runner
+  depends_on:
+   - mssql
+  entrypoint: ["/bin/bash", "/seed/init-mssql.sh"]
+  volumes:
+   - ./init/mssql:/seed
+  environment:
+   MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
+
  adminer:
   image: adminer:latest
   container_name: local-adminer
@@ -62,7 +73,7 @@ services:
    - "3306:3306"
   volumes:
    - mysqldata:/var/lib/mysql
-   - ./init-mysql:/docker-entrypoint-initdb.d
+   - ./init/mysql:/docker-entrypoint-initdb.d
 
  mongo:
   image: mongo:latest
@@ -72,7 +83,7 @@ services:
    - "27017:27017"
   volumes:
    - mongodata:/data/db
-   - ./init-mongo:/docker-entrypoint-initdb.d
+   - ./init/mongo:/docker-entrypoint-initdb.d
 
  mongo-express:
   image: mongo-express
@@ -83,6 +94,23 @@ services:
   environment:
    ME_CONFIG_MONGODB_SERVER: mongo
   depends_on:
+   - mongo
+
+ dbeaver:
+  image: dbeaver/cloudbeaver:latest
+  container_name: local-dbeaver
+  restart: unless-stopped
+  ports:
+   - "8084:8978"
+  environment:
+   CB_ADMIN_NAME: admin
+   CB_ADMIN_PASSWORD: admin
+  volumes:
+   - ./cloudbeaver/workspace:/opt/cloudbeaver/workspace
+  depends_on:
+   - postgres
+   - mssql
+   - mysql
    - mongo
 
 volumes:

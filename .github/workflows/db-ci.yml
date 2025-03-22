@@ -1,0 +1,37 @@
+name: DB Stack CI
+
+on:
+ push:
+  branches: [master, main]
+ pull_request:
+
+jobs:
+ integration-test:
+  runs-on: ubuntu-latest
+
+  services:
+   postgres:
+    image: postgres
+    env:
+     POSTGRES_USER: devuser
+     POSTGRES_PASSWORD: devpass
+     POSTGRES_DB: devdb
+    ports:
+     - 5432:5432
+    options: >-
+     --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+
+  steps:
+   - uses: actions/checkout@v3
+
+   - name: Setup Node
+     uses: actions/setup-node@v3
+     with:
+      node-version: 18
+
+   - name: Install deps
+     run: npm install
+
+   - name: Run integration tests
+     run: npm run test:db
