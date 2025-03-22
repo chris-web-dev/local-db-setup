@@ -1,0 +1,92 @@
+services:
+ postgres:
+  image: postgres:latest
+  container_name: local-postgres
+  restart: unless-stopped
+  environment:
+   POSTGRES_USER: ${POSTGRES_USER}
+   POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+   POSTGRES_DB: ${POSTGRES_DB}
+  ports:
+   - "5432:5432"
+  volumes:
+   - pgdata:/var/lib/postgresql/data
+   - ./init:/docker-entrypoint-initdb.d
+
+ pgadmin:
+  image: dpage/pgadmin4:latest
+  container_name: local-pgadmin
+  restart: unless-stopped
+  environment:
+   PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+   PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+  ports:
+   - "8082:80"
+  volumes:
+   - ./pgadmin/servers.json:/pgadmin4/servers.json
+  depends_on:
+   - postgres
+
+ mssql:
+  image: mcr.microsoft.com/mssql/server:2022-latest
+  container_name: local-mssql
+  restart: unless-stopped
+  environment:
+   SA_PASSWORD: ${MSSQL_SA_PASSWORD}
+   ACCEPT_EULA: "Y"
+   MSSQL_PID: "Express"
+  ports:
+   - "1433:1433"
+  volumes:
+   - mssqldata:/var/opt/mssql
+
+ adminer:
+  image: adminer:latest
+  container_name: local-adminer
+  restart: unless-stopped
+  ports:
+   - "8081:8080"
+  depends_on:
+   - mssql
+
+ mysql:
+  image: mysql:5.7
+  container_name: local-mysql
+  restart: unless-stopped
+  environment:
+   MYSQL_ROOT_PASSWORD: rootpass
+   MYSQL_DATABASE: devmysql
+   MYSQL_USER: devuser
+   MYSQL_PASSWORD: devpass
+  ports:
+   - "3306:3306"
+  volumes:
+   - mysqldata:/var/lib/mysql
+   - ./init-mysql:/docker-entrypoint-initdb.d
+
+ mongo:
+  image: mongo:latest
+  container_name: local-mongo
+  restart: unless-stopped
+  ports:
+   - "27017:27017"
+  volumes:
+   - mongodata:/data/db
+   - ./init-mongo:/docker-entrypoint-initdb.d
+
+ mongo-express:
+  image: mongo-express
+  container_name: local-mongo-express
+  restart: unless-stopped
+  ports:
+   - "8083:8081"
+  environment:
+   ME_CONFIG_MONGODB_SERVER: mongo
+  depends_on:
+   - mongo
+
+volumes:
+ pgdata:
+ mssqldata:
+ mysqldata:
+ mongodata:
